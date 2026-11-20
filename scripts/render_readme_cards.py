@@ -73,11 +73,11 @@ def delay(seconds: float) -> str:
     return f'style="animation-delay:{seconds:.2f}s"'
 
 
-def svg(name: str, height: int, body: str, fonts: tuple[str, ...], label: str, width: int = WIDTH) -> None:
+def svg(name: str, height: int, body: str, fonts: tuple[str, ...], label: str) -> None:
     css = "".join(FONT_CSS[k] for k in fonts) + CSS
     if STATIC:
         css += ".rise,.fade,.grow,.pulse,.drift,.sweep{animation:none!important;opacity:1!important;transform:none!important}"
-    content = f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-label="{escape(label)}"><title>{escape(label)}</title><style>{css}</style>{body}</svg>\n'
+    content = f'<svg xmlns="http://www.w3.org/2000/svg" width="{WIDTH}" height="{height}" viewBox="0 0 {WIDTH} {height}" role="img" aria-label="{escape(label)}"><title>{escape(label)}</title><style>{css}</style>{body}</svg>\n'
     OUT.mkdir(exist_ok=True)
     (OUT / name).write_text(content, encoding="utf-8")
     print(f"wrote cards/{name} ({len(content) // 1024} KB)")
@@ -117,8 +117,9 @@ def tiles() -> None:
     tile_w = (WIDTH - GAP * 2) / 3
     items = [("01", "WORK", "Selected systems and products", "#173047", BLUE, "zjn281r.tech/#vault"), ("02", "CAPABILITIES", "Growth, creative, digital, spatial", "#12302e", CYAN, "zjn281r.tech/#capabilities"), ("03", "CONTACT", "Start a conversation", "#283021", LIME, "mailto:zjn281r@gmail.com")]
     for i, (number, title, desc, fill, accent, _href) in enumerate(items):
-        body = f'''<rect width="{tile_w:.1f}" height="210" rx="14" fill="{fill}" stroke="{accent}" stroke-opacity=".25"/><g class="rise" {delay(1.15 + i*.18)}><text x="24" y="42" font-family="{MONO}" font-size="11" letter-spacing="1.2" fill="{accent}">{number} / {title}</text><text x="{tile_w-24:.1f}" y="42" text-anchor="end" font-family="{MONO}" font-size="16" fill="{accent}">↗</text>{lines(24, 95, wrap(desc, 21), 31, f'font-family="{SERIF}" font-size="27" fill="{INK}"')}<line x1="24" y1="156" x2="{tile_w-24:.1f}" y2="156" stroke="{accent}" stroke-opacity=".3"/><text x="24" y="184" font-family="{MONO}" font-size="10" fill="{MUTED}">OPEN LINK</text></g>'''
-        svg(f"tile-{i+1}.svg", 210, body, ("serif", "mono"), f"{title}: {desc}", width=round(tile_w))
+        x = i * (tile_w + GAP)
+        body = f'''<rect x="{x:.1f}" width="{tile_w:.1f}" height="210" rx="14" fill="{fill}" stroke="{accent}" stroke-opacity=".25"/><g class="rise" {delay(1.15 + i*.18)}><text x="{x+24:.1f}" y="42" font-family="{MONO}" font-size="11" letter-spacing="1.2" fill="{accent}">{number} / {title}</text><text x="{x+tile_w-24:.1f}" y="42" text-anchor="end" font-family="{MONO}" font-size="16" fill="{accent}">↗</text><text x="{x+24:.1f}" y="105" font-family="{SERIF}" font-size="28" fill="{INK}">{escape(desc)}</text><line x1="{x+24:.1f}" y1="156" x2="{x+tile_w-24:.1f}" y2="156" stroke="{accent}" stroke-opacity=".3"/><text x="{x+24:.1f}" y="184" font-family="{MONO}" font-size="10" fill="{MUTED}">OPEN LINK</text></g>'''
+        svg(f"tile-{i+1}.svg", 210, body, ("serif", "mono"), f"{title}: {desc}")
 
 
 def activity(data: dict) -> None:
