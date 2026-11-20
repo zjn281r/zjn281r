@@ -114,12 +114,29 @@ def hero() -> None:
 
 
 def tiles() -> None:
-    tile_w = (WIDTH - GAP * 2) / 3
-    items = [("01", "WORK", "Selected systems and products", "#173047", BLUE, "zjn281r.tech/#vault"), ("02", "CAPABILITIES", "Growth, creative, digital, spatial", "#12302e", CYAN, "zjn281r.tech/#capabilities"), ("03", "CONTACT", "Start a conversation", "#283021", LIME, "mailto:zjn281r@gmail.com")]
-    for i, (number, title, desc, fill, accent, _href) in enumerate(items):
-        x = i * (tile_w + GAP)
-        body = f'''<rect x="{x:.1f}" width="{tile_w:.1f}" height="210" rx="14" fill="{fill}" stroke="{accent}" stroke-opacity=".25"/><g class="rise" {delay(1.15 + i*.18)}><text x="{x+24:.1f}" y="42" font-family="{MONO}" font-size="11" letter-spacing="1.2" fill="{accent}">{number} / {title}</text><text x="{x+tile_w-24:.1f}" y="42" text-anchor="end" font-family="{MONO}" font-size="16" fill="{accent}">↗</text><text x="{x+24:.1f}" y="105" font-family="{SERIF}" font-size="28" fill="{INK}">{escape(desc)}</text><line x1="{x+24:.1f}" y1="156" x2="{x+tile_w-24:.1f}" y2="156" stroke="{accent}" stroke-opacity=".3"/><text x="{x+24:.1f}" y="184" font-family="{MONO}" font-size="10" fill="{MUTED}">OPEN LINK</text></g>'''
-        svg(f"tile-{i+1}.svg", 210, body, ("serif", "mono"), f"{title}: {desc}")
+    h = 210
+    pad_x = 40
+    items = [
+        ("01", "WORK", "Selected systems and products", "#173047", BLUE, "zjn281r.tech/#vault"),
+        ("02", "CAPABILITIES", "Growth, creative, digital, spatial", "#12302e", CYAN, "zjn281r.tech/#capabilities"),
+        ("03", "CONTACT", "Start a conversation", "#283021", LIME, "mailto:zjn281r@gmail.com"),
+    ]
+    for i, (number, title, desc, fill, accent, href) in enumerate(items):
+        wrapped = wrap(desc, 42)
+        desc_y = 104 if len(wrapped) == 1 else 94
+        desc_svg = lines(pad_x, desc_y, wrapped, 34, f'font-family="{SERIF}" font-size="30" fill="{INK}"')
+        body = (
+            f'<rect width="{WIDTH}" height="{h}" rx="16" fill="{fill}" stroke="{accent}" stroke-opacity=".35"/>'
+            f'<g class="rise" {delay(1.15 + i * .18)}>'
+            f'<text x="{pad_x}" y="44" font-family="{MONO}" font-size="12" letter-spacing="1.4" fill="{accent}">{number} / {title}</text>'
+            f'<text x="{WIDTH - pad_x}" y="44" text-anchor="end" font-family="{MONO}" font-size="18" fill="{accent}">↗</text>'
+            f'{desc_svg}'
+            f'<line x1="{pad_x}" y1="156" x2="{WIDTH - pad_x}" y2="156" stroke="{accent}" stroke-opacity=".3"/>'
+            f'<text x="{pad_x}" y="182" font-family="{MONO}" font-size="11" letter-spacing="1" fill="{MUTED}">OPEN LINK</text>'
+            f'<text x="{WIDTH - pad_x}" y="182" text-anchor="end" font-family="{MONO}" font-size="11" fill="{accent}">{escape(href)}</text>'
+            f'</g>'
+        )
+        svg(f"tile-{i+1}.svg", h, body, ("serif", "mono"), f"{title}: {desc}")
 
 
 def activity(data: dict) -> None:
